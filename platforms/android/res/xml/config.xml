@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.wtr" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="NativeStorage">
+        <param name="android-package" value="NativeStorage" />
+    </feature>
+    <feature name="Notification">
+        <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
+    </feature>
+    <feature name="ExitApp">
+        <param name="android-package" value="cordova.custom.plugins.exitapp.ExitApp" />
+    </feature>
+    <name>Water Tracker</name>
+    <description>
+        An app to help track the volume of water filtered by your BRITA filter.
+    </description>
+    <author email="dakshkumargupta@gmail.com" href="linkedin.com/in/dakshgupta">
+        Daksh Gupta
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <preference name="loglevel" value="DEBUG" />
+    <preference name="Orientation" value="portrait" />
+</widget>
