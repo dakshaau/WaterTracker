@@ -10,5 +10,5 @@ Technologies used:
 Packages used:
 - Bootstrap
 
-Platfrom used:
+Platform used:
 - Apache Cordova
