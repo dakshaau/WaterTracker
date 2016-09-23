@@ -7,7 +7,7 @@ Technologies used:
 - JavaScript
 - jQuery
 
-Packages used:
+Framework used:
 - Bootstrap
 
 Platform used:
