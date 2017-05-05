@@ -19,4 +19,5 @@
         <allow-intent href="itms-apps:*" />
     </platform>
     <preference name="Orientation" value="portrait" />
+    <plugin name="cordova-plugin-nativestorage" spec="~2.2.2" />
 </widget>
