@@ -21,6 +21,7 @@ var app = {
             //navigator.notification.alert(String(obj.max)+' '+String(obj.current),function(){},'Value Found','Ok');
             var m = obj.max;
             var cur = obj.current;
+            console.log(obj)
             var percent = 0.0;
             percent = (cur/m)*100;
             // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
@@ -122,6 +123,7 @@ var app = {
                     NativeStorage.setItem("filter_usage",newobj,function(obj){
                         var mx = obj.max;
                         var cr = obj.current;
+                        console.log(obj)
                         var percent = 0.0;
                         percent = (cr/mx)*100;
                         // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
@@ -175,6 +177,7 @@ var app = {
                     NativeStorage.setItem("filter_usage",newobj,function(obj){
                         var mx = obj.max;
                         var cr = obj.current;
+                        console.log(obj)
                         var percent = 0.0;
                         percent = (cr/mx)*100;
                         // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
@@ -228,6 +231,7 @@ var app = {
                     NativeStorage.setItem("filter_usage",newobj,function(obj){
                         var mx = obj.max;
                         var cr = obj.current;
+                        console.log(obj)
                         var percent = 0.0;
                         percent = (cr/mx)*100;
                         // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
