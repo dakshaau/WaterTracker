@@ -78,7 +78,7 @@ var app = {
 	        	}, function(tx, error){
 	        		navigator.app.exitApp();
 	        	});
-	        	navigator.notification.prompt("Enter maximum value in Gallons", function(res){
+	        	navigator.notification.prompt("Enter maximum allowed value in Gallons", function(res){
         			// console.log(input.input1);
         			// console.log(tx);
         			x = res.input1;
@@ -86,22 +86,24 @@ var app = {
 	                    console.error(String(x)+' is not an floating point value');
 	                    navigator.app.exitApp();
 	                }
-	                db.transaction(function(tx){
-	                	tx.executeSql("INSERT INTO water(max_cap, usage) VALUES(?,?)",[Number(x), 0.0], function(tx, res){
-		                	console.log('Values inserted!');
-		                	setProgress(0, 0);
-		                }, function(tx, err){
-		                	console.error(err.message);
-		                	navigator.notification.alert(err.message, function(){
-		                        navigator.app.exitApp();
-		                    }, 'Error', 'Ok');
+	                else{
+	                	db.transaction(function(tx){
+		                	tx.executeSql("INSERT INTO water(max_cap, usage) VALUES(?,?)",[Number(x), 0.0], function(tx, res){
+			                	console.log('Values inserted!');
+			                	setProgress(0, 0);
+			                }, function(tx, err){
+			                	console.error(err.message);
+			                	navigator.notification.alert(err.message, function(){
+			                        navigator.app.exitApp();
+			                    }, 'Error', 'Ok');
+			                });
+		                }, function(error){
+		                	console.error('Unable to Insert into water');
+		                	console.error(error.message);
+		                }, function(){
+		                	console.log('Inserted Values');
 		                });
-	                }, function(error){
-	                	console.error('Unable to Insert into water');
-	                	console.error(error.message);
-	                }, function(){
-	                	console.log('Inserted Values');
-	                });
+	                }
         		}, ['Enter a value'], ['OK', 'Cancel'], '40');
         	});
         }, function(error){
@@ -110,68 +112,6 @@ var app = {
         }, function(success){
         	console.log('Transaction Successful');
         });
-
-        // NativeStorage.getItem("filter_usage",function(obj){
-        //     //navigator.notification.alert(String(obj.max)+' '+String(obj.current),function(){},'Value Found','Ok');
-        //     var m = obj.max;
-        //     var cur = obj.current;
-        //     console.log(obj)
-        //     var percent = 0.0;
-        //     percent = (cur/m)*100;
-        //     // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
-        //     $('#progr').css("width",String(percent)+"%");
-        //     $('#progr').html(String(cur.toFixed(2))+' Gal');
-        //     // navigator.notification.alert(percent,function(){},'in If','ok');
-        //     if (percent <= 60)
-        //     {
-        //          console.log('In second IF');
-        //          $('#progr').removeClass('progress-bar-warning');
-        //          $('#progr').removeClass('progress-bar-danger');
-        //          $('#progr').removeClass('progress-bar-success');
-        //          $('#progr').addClass('progress-bar-success');
-        //     } 
-        //     else if (percent > 60 && percent <= 80) 
-        //     {
-        //          $('#progr').removeClass('progress-bar-success');
-        //          $('#progr').removeClass('progress-bar-danger');
-        //          $('#progr').removeClass('progress-bar-warning');
-        //          $('#progr').addClass("progress-bar-warning");
-        //     } 
-        //     else 
-        //     {
-        //          console.log('In third IF');
-        //          $('#progr').removeClass('progress-bar-success');
-        //          $('#progr').removeClass('progress-bar-warning');
-        //          $('#progr').removeClass('progress-bar-danger');
-        //          $('#progr').addClass('progress-bar-danger');
-        //     }
-        // }, function(error){
-        //     // navigator.notification.alert(error.exception,function(){
-        //     //     navigator.app.exitApp();
-        //     // },'Error','Ok')
-        //     console.error(error);
-            // navigator.notification.prompt('Enter maximum allowed value in Gallons', function(res){
-            //     var x = res.input1;
-            //     if (Number(x) !== parseFloat(x)){
-            //         console.error('X is not an floating point value');
-            //         navigator.app.exitApp();
-            //     }
-            //     var object = {max: Number(x), current: 0}
-            //     NativeStorage.setItem("filter_usage", object, function(obj){
-            //         $('#progr').css("width","0%");
-            //         $('#progr').html('0 Gal');
-            //         $('#progr').removeClass('progress-bar-warning');
-            //         $('#progr').removeClass('progress-bar-danger');
-            //         $('#progr').removeClass('progress-bar-success');
-            //         $('#progr').addClass('progress-bar-success');
-            //     }, function(error){
-            //         console.error(error);
-            //         navigator.notification.alert(error.code, function(){
-            //             navigator.app.exitApp();
-            //         }, 'Error', 'Ok');
-            //     });
-            // }, 'Enter Value', ['Ok']);
-        // });
 
         $(document).on('backbutton',function(){
             navigator.app.exitApp();
@@ -185,23 +125,27 @@ var app = {
                 }
                 var x = res.input1;
                 if (Number(x) !== parseFloat(x)){
-                    console.error('X is not an floating point value');
+                    console.error(String(x)+' is not an floating point value');
                     navigator.app.exitApp();
                 }
-                var object = {max: Number(x), current: 0}
-                NativeStorage.setItem("filter_usage", object, function(obj){
-                    $('#progr').css("width","0%");
-                    $('#progr').html('0 Gal');
-                    $('#progr').removeClass('progress-bar-warning');
-                    $('#progr').removeClass('progress-bar-danger');
-                    $('#progr').removeClass('progress-bar-success');
-                    $('#progr').addClass('progress-bar-success');
-                }, function(error){
-                    console.error(error);
-                    navigator.notification.alert(error.code, function(){
-                        navigator.app.exitApp();
-                    }, 'Error', 'Ok');
-                });
+                else{
+                	db.transaction(function(tx){
+	                	tx.executeSql("UPDATE water SET max_cap=?, usage=? WHERE ID=1",[Number(x),0],function(tx, res){
+	                		console.log('Reset value success');
+	                		setProgress(0,0);
+	                	}, function(tx, err){
+	                		console.error('Unable to reset values');
+	                		console.error(err.message);
+	                		navigator.notification.alert(error.message, function(){
+	                			navigator.app.exitApp();
+	                		}, 'Error', 'Ok');
+	                	});
+	                }, function(err){
+	                	console.error(err);
+	                }, function(){
+	                	console.log('Reset Successful');
+	                });	
+                }
             }, 'Enter Value', ['Ok','Cancel'],'40');
         });
 
