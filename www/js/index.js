@@ -16,68 +16,120 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-        
-        NativeStorage.getItem("filter_usage",function(obj){
-            //navigator.notification.alert(String(obj.max)+' '+String(obj.current),function(){},'Value Found','Ok');
-            var m = obj.max;
-            var cur = obj.current;
-            console.log(obj)
-            var percent = 0.0;
-            percent = (cur/m)*100;
-            // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
-            $('#progr').css("width",String(percent)+"%");
-            $('#progr').html(String(cur.toFixed(2))+' Gal');
-            // navigator.notification.alert(percent,function(){},'in If','ok');
-            if (percent <= 60)
-            {
-                 console.log('In second IF');
-                 $('#progr').removeClass('progress-bar-warning');
-                 $('#progr').removeClass('progress-bar-danger');
-                 $('#progr').removeClass('progress-bar-success');
-                 $('#progr').addClass('progress-bar-success');
-            } 
-            else if (percent > 60 && percent <= 80) 
-            {
-                 $('#progr').removeClass('progress-bar-success');
-                 $('#progr').removeClass('progress-bar-danger');
-                 $('#progr').removeClass('progress-bar-warning');
-                 $('#progr').addClass("progress-bar-warning");
-            } 
-            else 
-            {
-                 console.log('In third IF');
-                 $('#progr').removeClass('progress-bar-success');
-                 $('#progr').removeClass('progress-bar-warning');
-                 $('#progr').removeClass('progress-bar-danger');
-                 $('#progr').addClass('progress-bar-danger');
-            }
+
+        // console.log(sqlitePlugin)
+
+        var db = sqlitePlugin.openDatabase('WaterTacker.db','1.0','',1);
+        // console.log(db);
+
+        db.transaction(function(tx){
+        	console.log(tx);
+        	tx.executeSql("SELECT * FROM water",[],function(tx, res){
+        		//
+        		console.log("Values Found");
+        		console.log(res);
+
+        		
+        	}, function(tx, error){
+        		//
+        		console.error("No Values");
+        		console.error(error.message);
+	        	tx.executeSql("CREATE TABLE IF NOT EXISTS water(ID INTEGER PRIMARY KEY ASC, max_cap REAL, usage REAL)",[],function(tx, res){
+	        		navigator.notification.prompt("Enter maximum value in Gallons", function(input){
+	        			// console.log(input.input1);
+	        			// console.log(tx);
+	        			x = input.input1;
+	        			if (Number(x) !== parseFloat(x)){
+		                    console.error(String(x)+' is not an floating point value');
+		                    navigator.app.exitApp();
+		                }
+		                tx.executeSql("INSERT INTO water(max_cap, usage) VALUES(?,?)",[Number(x), 0.0], function(tx, res){
+		                	console.log('Values inserted!');
+		                	$('#progr').css("width","0%");
+		                    $('#progr').html('0 Gal');
+		                    $('#progr').removeClass('progress-bar-warning');
+		                    $('#progr').removeClass('progress-bar-danger');
+		                    $('#progr').removeClass('progress-bar-success');
+		                    $('#progr').addClass('progress-bar-success');
+		                }, function(tx, err){
+		                	console.error(err.message);
+		                	navigator.notification.alert(err.message, function(){
+		                        navigator.app.exitApp();
+		                    }, 'Error', 'Ok');
+		                });
+	        		}, ['Enter a value'], ['OK', 'Cancel'], '40');
+
+	        	}, function(tx, error){
+	        		navigator.app.exitApp();
+	        	});
+        	});
         }, function(error){
-            // navigator.notification.alert(error.exception,function(){
-            //     navigator.app.exitApp();
-            // },'Error','Ok')
-            console.error(error);
-            navigator.notification.prompt('Enter maximum allowed value in Gallons', function(res){
-                var x = res.input1;
-                if (Number(x) !== parseFloat(x)){
-                    console.error('X is not an floating point value');
-                    navigator.app.exitApp();
-                }
-                var object = {max: Number(x), current: 0}
-                NativeStorage.setItem("filter_usage", object, function(obj){
-                    $('#progr').css("width","0%");
-                    $('#progr').html('0 Gal');
-                    $('#progr').removeClass('progress-bar-warning');
-                    $('#progr').removeClass('progress-bar-danger');
-                    $('#progr').removeClass('progress-bar-success');
-                    $('#progr').addClass('progress-bar-success');
-                }, function(error){
-                    console.error(error);
-                    navigator.notification.alert(error.code, function(){
-                        navigator.app.exitApp();
-                    }, 'Error', 'Ok');
-                });
-            }, 'Enter Value', ['Ok']);
+
+        }, function(success){
+
         });
+
+        // NativeStorage.getItem("filter_usage",function(obj){
+        //     //navigator.notification.alert(String(obj.max)+' '+String(obj.current),function(){},'Value Found','Ok');
+        //     var m = obj.max;
+        //     var cur = obj.current;
+        //     console.log(obj)
+        //     var percent = 0.0;
+        //     percent = (cur/m)*100;
+        //     // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
+        //     $('#progr').css("width",String(percent)+"%");
+        //     $('#progr').html(String(cur.toFixed(2))+' Gal');
+        //     // navigator.notification.alert(percent,function(){},'in If','ok');
+        //     if (percent <= 60)
+        //     {
+        //          console.log('In second IF');
+        //          $('#progr').removeClass('progress-bar-warning');
+        //          $('#progr').removeClass('progress-bar-danger');
+        //          $('#progr').removeClass('progress-bar-success');
+        //          $('#progr').addClass('progress-bar-success');
+        //     } 
+        //     else if (percent > 60 && percent <= 80) 
+        //     {
+        //          $('#progr').removeClass('progress-bar-success');
+        //          $('#progr').removeClass('progress-bar-danger');
+        //          $('#progr').removeClass('progress-bar-warning');
+        //          $('#progr').addClass("progress-bar-warning");
+        //     } 
+        //     else 
+        //     {
+        //          console.log('In third IF');
+        //          $('#progr').removeClass('progress-bar-success');
+        //          $('#progr').removeClass('progress-bar-warning');
+        //          $('#progr').removeClass('progress-bar-danger');
+        //          $('#progr').addClass('progress-bar-danger');
+        //     }
+        // }, function(error){
+        //     // navigator.notification.alert(error.exception,function(){
+        //     //     navigator.app.exitApp();
+        //     // },'Error','Ok')
+        //     console.error(error);
+            // navigator.notification.prompt('Enter maximum allowed value in Gallons', function(res){
+            //     var x = res.input1;
+            //     if (Number(x) !== parseFloat(x)){
+            //         console.error('X is not an floating point value');
+            //         navigator.app.exitApp();
+            //     }
+            //     var object = {max: Number(x), current: 0}
+            //     NativeStorage.setItem("filter_usage", object, function(obj){
+            //         $('#progr').css("width","0%");
+            //         $('#progr').html('0 Gal');
+            //         $('#progr').removeClass('progress-bar-warning');
+            //         $('#progr').removeClass('progress-bar-danger');
+            //         $('#progr').removeClass('progress-bar-success');
+            //         $('#progr').addClass('progress-bar-success');
+            //     }, function(error){
+            //         console.error(error);
+            //         navigator.notification.alert(error.code, function(){
+            //             navigator.app.exitApp();
+            //         }, 'Error', 'Ok');
+            //     });
+            // }, 'Enter Value', ['Ok']);
+        // });
 
         $(document).on('backbutton',function(){
             navigator.app.exitApp();

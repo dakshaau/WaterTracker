@@ -16,9 +16,13 @@
         "cordova.custom.plugins.exitapp": {
             "PACKAGE_NAME": "com.wtr"
         },
-        "cordova-plugin-nativestorage": {
+        "cordova-plugin-sqlite-2": {
             "PACKAGE_NAME": "com.wtr"
         }
     },
-    "dependent_plugins": {}
+    "dependent_plugins": {
+        "cordova-plugin-chrome-apps-common": {
+            "PACKAGE_NAME": "com.wtr"
+        }
+    }
 }

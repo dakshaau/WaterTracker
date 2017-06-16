@@ -23,10 +23,18 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-nativestorage": {
+    "cordova-plugin-chrome-apps-common": {
         "source": {
             "type": "registry",
-            "id": "cordova-plugin-nativestorage"
+            "id": "cordova-plugin-chrome-apps-common@1"
+        },
+        "is_top_level": false,
+        "variables": {}
+    },
+    "cordova-plugin-sqlite-2": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-sqlite-2"
         },
         "is_top_level": true,
         "variables": {}

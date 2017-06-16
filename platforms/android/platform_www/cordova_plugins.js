@@ -25,22 +25,35 @@ module.exports = [
         ]
     },
     {
-        "id": "cordova-plugin-nativestorage.mainHandle",
-        "file": "plugins/cordova-plugin-nativestorage/www/mainHandle.js",
-        "pluginId": "cordova-plugin-nativestorage",
+        "id": "cordova-plugin-chrome-apps-common.events",
+        "file": "plugins/cordova-plugin-chrome-apps-common/events.js",
+        "pluginId": "cordova-plugin-chrome-apps-common",
         "clobbers": [
-            "NativeStorage"
+            "chrome.Event"
         ]
     },
     {
-        "id": "cordova-plugin-nativestorage.LocalStorageHandle",
-        "file": "plugins/cordova-plugin-nativestorage/www/LocalStorageHandle.js",
-        "pluginId": "cordova-plugin-nativestorage"
+        "id": "cordova-plugin-chrome-apps-common.errors",
+        "file": "plugins/cordova-plugin-chrome-apps-common/errors.js",
+        "pluginId": "cordova-plugin-chrome-apps-common"
     },
     {
-        "id": "cordova-plugin-nativestorage.NativeStorageError",
-        "file": "plugins/cordova-plugin-nativestorage/www/NativeStorageError.js",
-        "pluginId": "cordova-plugin-nativestorage"
+        "id": "cordova-plugin-chrome-apps-common.stubs",
+        "file": "plugins/cordova-plugin-chrome-apps-common/stubs.js",
+        "pluginId": "cordova-plugin-chrome-apps-common"
+    },
+    {
+        "id": "cordova-plugin-chrome-apps-common.helpers",
+        "file": "plugins/cordova-plugin-chrome-apps-common/helpers.js",
+        "pluginId": "cordova-plugin-chrome-apps-common"
+    },
+    {
+        "id": "cordova-plugin-sqlite-2.sqlitePlugin",
+        "file": "plugins/cordova-plugin-sqlite-2/dist/sqlite-plugin.js",
+        "pluginId": "cordova-plugin-sqlite-2",
+        "clobbers": [
+            "sqlitePlugin"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -49,7 +62,8 @@ module.exports.metadata =
     "cordova-plugin-whitelist": "1.3.0",
     "cordova-plugin-dialogs": "1.3.0",
     "cordova.custom.plugins.exitapp": "1.0.0",
-    "cordova-plugin-nativestorage": "2.2.2"
+    "cordova-plugin-chrome-apps-common": "1.0.7",
+    "cordova-plugin-sqlite-2": "1.0.4"
 };
 // BOTTOM OF METADATA
 });
