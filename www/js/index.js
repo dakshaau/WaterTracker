@@ -19,6 +19,38 @@ var app = {
 
         // console.log(sqlitePlugin)
 
+        function setProgress(percent, cur){
+        	/*
+        	This function set the progress bar of WaterTracker
+        	*/
+        	$('#progr').css("width",String(percent)+"%");
+            $('#progr').html(String(cur.toFixed(2))+' Gal');
+            // navigator.notification.alert(percent,function(){},'in If','ok');
+            if (percent <= 60)
+            {
+                 console.log('In second IF');
+                 $('#progr').removeClass('progress-bar-warning');
+                 $('#progr').removeClass('progress-bar-danger');
+                 $('#progr').removeClass('progress-bar-success');
+                 $('#progr').addClass('progress-bar-success');
+            } 
+            else if (percent > 60 && percent <= 80) 
+            {
+                 $('#progr').removeClass('progress-bar-success');
+                 $('#progr').removeClass('progress-bar-danger');
+                 $('#progr').removeClass('progress-bar-warning');
+                 $('#progr').addClass("progress-bar-warning");
+            } 
+            else 
+            {
+                 console.log('In third IF');
+                 $('#progr').removeClass('progress-bar-success');
+                 $('#progr').removeClass('progress-bar-warning');
+                 $('#progr').removeClass('progress-bar-danger');
+                 $('#progr').addClass('progress-bar-danger');
+            }
+        }
+
         var db = sqlitePlugin.openDatabase('WaterTacker.db','1.0','',1);
         // console.log(db);
 
@@ -27,7 +59,14 @@ var app = {
         	tx.executeSql("SELECT * FROM water",[],function(tx, res){
         		//
         		console.log("Values Found");
-        		console.log(res);
+        		// console.log(res);
+        		obj = res.rows.item(0);
+        		console.log(obj);
+        		m = obj.max_cap;
+        		cur = obj.usage;
+        		var percent = 0.0;
+	            percent = (cur/m)*100;
+	            setProgress(percent, cur);
 
         		
         	}, function(tx, error){
@@ -50,12 +89,7 @@ var app = {
 	                db.transaction(function(tx){
 	                	tx.executeSql("INSERT INTO water(max_cap, usage) VALUES(?,?)",[Number(x), 0.0], function(tx, res){
 		                	console.log('Values inserted!');
-		                	$('#progr').css("width","0%");
-		                    $('#progr').html('0 Gal');
-		                    $('#progr').removeClass('progress-bar-warning');
-		                    $('#progr').removeClass('progress-bar-danger');
-		                    $('#progr').removeClass('progress-bar-success');
-		                    $('#progr').addClass('progress-bar-success');
+		                	setProgress(0, 0);
 		                }, function(tx, err){
 		                	console.error(err.message);
 		                	navigator.notification.alert(err.message, function(){
