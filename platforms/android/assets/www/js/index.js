@@ -35,15 +35,20 @@ var app = {
         		console.error("No Values");
         		console.error(error.message);
 	        	tx.executeSql("CREATE TABLE IF NOT EXISTS water(ID INTEGER PRIMARY KEY ASC, max_cap REAL, usage REAL)",[],function(tx, res){
-	        		navigator.notification.prompt("Enter maximum value in Gallons", function(input){
-	        			// console.log(input.input1);
-	        			// console.log(tx);
-	        			x = input.input1;
-	        			if (Number(x) !== parseFloat(x)){
-		                    console.error(String(x)+' is not an floating point value');
-		                    navigator.app.exitApp();
-		                }
-		                tx.executeSql("INSERT INTO water(max_cap, usage) VALUES(?,?)",[Number(x), 0.0], function(tx, res){
+	        		//
+	        	}, function(tx, error){
+	        		navigator.app.exitApp();
+	        	});
+	        	navigator.notification.prompt("Enter maximum value in Gallons", function(res){
+        			// console.log(input.input1);
+        			// console.log(tx);
+        			x = res.input1;
+        			if (Number(x) !== parseFloat(x)){
+	                    console.error(String(x)+' is not an floating point value');
+	                    navigator.app.exitApp();
+	                }
+	                db.transaction(function(tx){
+	                	tx.executeSql("INSERT INTO water(max_cap, usage) VALUES(?,?)",[Number(x), 0.0], function(tx, res){
 		                	console.log('Values inserted!');
 		                	$('#progr').css("width","0%");
 		                    $('#progr').html('0 Gal');
@@ -57,16 +62,19 @@ var app = {
 		                        navigator.app.exitApp();
 		                    }, 'Error', 'Ok');
 		                });
-	        		}, ['Enter a value'], ['OK', 'Cancel'], '40');
-
-	        	}, function(tx, error){
-	        		navigator.app.exitApp();
-	        	});
+	                }, function(error){
+	                	console.error('Unable to Insert into water');
+	                	console.error(error.message);
+	                }, function(){
+	                	console.log('Inserted Values');
+	                });
+        		}, ['Enter a value'], ['OK', 'Cancel'], '40');
         	});
         }, function(error){
+        	console.error('Transaction Failed');
 
         }, function(success){
-
+        	console.log('Transaction Successful');
         });
 
         // NativeStorage.getItem("filter_usage",function(obj){
