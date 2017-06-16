@@ -1,4 +1,36 @@
 
+function setProgress(percent, cur){
+	/*
+	This function set the progress bar of WaterTracker
+	*/
+	$('#progr').css("width",String(percent)+"%");
+    $('#progr').html(String(cur.toFixed(2))+' Gal');
+    // navigator.notification.alert(percent,function(){},'in If','ok');
+    if (percent <= 60)
+    {
+         console.log('In second IF');
+         $('#progr').removeClass('progress-bar-warning');
+         $('#progr').removeClass('progress-bar-danger');
+         $('#progr').removeClass('progress-bar-success');
+         $('#progr').addClass('progress-bar-success');
+    } 
+    else if (percent > 60 && percent <= 80) 
+    {
+         $('#progr').removeClass('progress-bar-success');
+         $('#progr').removeClass('progress-bar-danger');
+         $('#progr').removeClass('progress-bar-warning');
+         $('#progr').addClass("progress-bar-warning");
+    } 
+    else 
+    {
+         console.log('In third IF');
+         $('#progr').removeClass('progress-bar-success');
+         $('#progr').removeClass('progress-bar-warning');
+         $('#progr').removeClass('progress-bar-danger');
+         $('#progr').addClass('progress-bar-danger');
+    }
+}
+
 var app = {
     // Application Constructor
     initialize: function() {
@@ -19,39 +51,8 @@ var app = {
 
         // console.log(sqlitePlugin)
 
-        function setProgress(percent, cur){
-        	/*
-        	This function set the progress bar of WaterTracker
-        	*/
-        	$('#progr').css("width",String(percent)+"%");
-            $('#progr').html(String(cur.toFixed(2))+' Gal');
-            // navigator.notification.alert(percent,function(){},'in If','ok');
-            if (percent <= 60)
-            {
-                 console.log('In second IF');
-                 $('#progr').removeClass('progress-bar-warning');
-                 $('#progr').removeClass('progress-bar-danger');
-                 $('#progr').removeClass('progress-bar-success');
-                 $('#progr').addClass('progress-bar-success');
-            } 
-            else if (percent > 60 && percent <= 80) 
-            {
-                 $('#progr').removeClass('progress-bar-success');
-                 $('#progr').removeClass('progress-bar-danger');
-                 $('#progr').removeClass('progress-bar-warning');
-                 $('#progr').addClass("progress-bar-warning");
-            } 
-            else 
-            {
-                 console.log('In third IF');
-                 $('#progr').removeClass('progress-bar-success');
-                 $('#progr').removeClass('progress-bar-warning');
-                 $('#progr').removeClass('progress-bar-danger');
-                 $('#progr').addClass('progress-bar-danger');
-            }
-        }
-
         var db = sqlitePlugin.openDatabase('WaterTacker.db','1.0','',1);
+
         // console.log(db);
 
         db.transaction(function(tx){
@@ -149,169 +150,46 @@ var app = {
             }, 'Enter Value', ['Ok','Cancel'],'40');
         });
 
-        $('form').submit(function(){
+        $('form').submit(function(event){
+        	event.preventDefault();
+
+            function updateUsage(container, volume, factor){
+            	db.transaction(function(tx){
+            		tx.executeSql("SELECT * FROM water",[],function(tx, res){
+            			cur = res.rows.item(0).usage;
+            			m = res.rows.item(0).max_cap;
+            			update = container*volume*factor;
+            			cur += update;
+            			percent = (cur/m)*100;
+            			tx.executeSql("UPDATE water SET usage=? WHERE ID=1",[cur],function(tx, res){
+            				setProgress(percent, cur);
+            			}, function(tx, err){
+            				console.error('Unable to update');
+            				navigator.notification.alert(err.message,function(){
+            					navigator.app.exitApp();
+            				}, 'Error', 'Ok');
+            			});
+            		}, function(tx, err){
+            			//Error
+            			console.error('Unable to read from water');
+            		});
+            	}, function(err){
+            		//Error
+            	}, function(){
+            		//Success
+            	});
+            }
+
             unit = $('#unit').val();
+            // console.log(object);
             if (unit == 'mL'){
-                update = Number($('#cont').val()) * Number($('#vol').val()) * 0.000264172;
-                function success(obj){
-                    cur = obj.current;
-                    m = obj.max;
-                    cur += update;
-                    newobj = {max: m, current: cur};
-                    NativeStorage.setItem("filter_usage",newobj,function(obj){
-                        var mx = obj.max;
-                        var cr = obj.current;
-                        console.log(obj)
-                        var percent = 0.0;
-                        percent = (cr/mx)*100;
-                        // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
-                        $('#progr').css("width",String(percent)+"%");
-                        $('#progr').html(String(cr.toFixed(2))+' Gal');
-                        // navigator.notification.alert(percent,function(){},'in If','ok');
-                        if (percent <= 60)
-                        {
-                            console.log('In second IF');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').addClass('progress-bar-success');
-                        } 
-                        else if (percent > 60 && percent <= 80) 
-                        {
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').addClass("progress-bar-warning");
-                        } 
-                        else 
-                        {
-                            console.log('In third IF');
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').addClass('progress-bar-danger');
-                        }
-                    }, function(error){
-                        console.error(error);
-                        navigator.notification.alert(error.code, function(){
-                            navigator.app.exitApp();
-                        }, 'Error', 'Ok');
-                    });
-                }
-                NativeStorage.getItem("filter_usage",success,function(error){
-                    console.error(error);
-                    navigator.notification.alert(error.code, function(){
-                        navigator.app.exitApp();
-                    }, 'Error', 'Ok');
-                });
+                updateUsage(Number($('#cont').val()), Number($('#vol').val()), 0.000264172);
             }
             else if(unit == 'L'){
-                update = Number($('#cont').val()) * Number($('#vol').val()) * 0.264172;
-                function success(obj){
-                    cur = obj.current;
-                    m = obj.max;
-                    cur += update;
-                    newobj = {max: m, current: cur};
-                    NativeStorage.setItem("filter_usage",newobj,function(obj){
-                        var mx = obj.max;
-                        var cr = obj.current;
-                        console.log(obj)
-                        var percent = 0.0;
-                        percent = (cr/mx)*100;
-                        // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
-                        $('#progr').css("width",String(percent)+"%");
-                        $('#progr').html(String(cr.toFixed(2))+' Gal');
-                        // navigator.notification.alert(percent,function(){},'in If','ok');
-                        if (percent <= 60)
-                        {
-                            console.log('In second IF');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').addClass('progress-bar-success');
-                        } 
-                        else if (percent > 60 && percent <= 80) 
-                        {
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').addClass("progress-bar-warning");
-                        } 
-                        else 
-                        {
-                            console.log('In third IF');
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').addClass('progress-bar-danger');
-                        }
-                    }, function(error){
-                        console.error(error);
-                        navigator.notification.alert(error.code, function(){
-                            navigator.app.exitApp();
-                        }, 'Error', 'Ok');
-                    });
-                }
-                NativeStorage.getItem("filter_usage",success,function(error){
-                    console.error(error);
-                    navigator.notification.alert(error.code, function(){
-                        navigator.app.exitApp();
-                    }, 'Error', 'Ok');
-                });
+                updateUsage(Number($('#cont').val()), Number($('#vol').val()), 0.264172);
             }
             else if(unit == 'Gallon'){
-                update = Number($('#cont').val()) * Number($('#vol').val());
-                function success(obj){
-                    cur = obj.current;
-                    m = obj.max;
-                    cur += update;
-                    newobj = {max: m, current: cur};
-                    NativeStorage.setItem("filter_usage",newobj,function(obj){
-                        var mx = obj.max;
-                        var cr = obj.current;
-                        console.log(obj)
-                        var percent = 0.0;
-                        percent = (cr/mx)*100;
-                        // navigator.notification.alert(percent,function(){}, 'Value Found','ok')
-                        $('#progr').css("width",String(percent)+"%");
-                        $('#progr').html(String(cr.toFixed(2))+' Gal');
-                        // navigator.notification.alert(percent,function(){},'in If','ok');
-                        if (percent <= 60)
-                        {
-                            console.log('In second IF');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').addClass('progress-bar-success');
-                        } 
-                        else if (percent > 60 && percent <= 80) 
-                        {
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').addClass("progress-bar-warning");
-                        } 
-                        else 
-                        {
-                            console.log('In third IF');
-                            $('#progr').removeClass('progress-bar-success');
-                            $('#progr').removeClass('progress-bar-warning');
-                            $('#progr').removeClass('progress-bar-danger');
-                            $('#progr').addClass('progress-bar-danger');
-                        }
-                    }, function(error){
-                        console.error(error);
-                        navigator.notification.alert(error.code, function(){
-                            navigator.app.exitApp();
-                        }, 'Error', 'Ok');
-                    });
-                }
-                NativeStorage.getItem("filter_usage",success,function(error){
-                    console.error(error);
-                    navigator.notification.alert(error.code, function(){
-                        navigator.app.exitApp();
-                    }, 'Error', 'Ok');
-                });
+                updateUsage(Number($('#cont').val()), Number($('#vol').val()), 1);
             }
         });
     },
